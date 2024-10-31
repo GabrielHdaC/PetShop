@@ -2,75 +2,52 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-/**
- * A classe ClienteController é responsável por gerenciar o cadastro e a listagem de clientes
- * e seus animais de estimação.
- * Esta classe utiliza a classe ClienteData para armazenar os dados dos clientes.
- */
 public class ClienteController {
-    private final List<ClienteData> clientes = new ArrayList<>();  // Lista para armazenar clientes
-    private final Scanner sc = new Scanner(System.in);              // Scanner para entrada de dados
+    private List<ClienteData> clientes = new ArrayList<>();
 
-    /**
-     * Método para cadastrar um novo cliente e seu animal de estimação.
-     * Este método solicita as informações do cliente, valida os dados e
-     * armazena um novo objeto ClienteData na lista de clientes.
-     */
     public void cadastrarCliente() {
-        System.out.println("Cadastrando cliente!");
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Digite o nome do cliente: ");
+        String nome = scanner.nextLine();
+        System.out.print("Digite o nome do animal de estimação: ");
+        String nomeAnimal = scanner.nextLine();
+        System.out.print("Digite o tipo do animal: ");
+        String tipoAnimal = scanner.nextLine();
 
-        // Solicita o nome do cliente
-        System.out.print("Digite o seu nome: ");
-        String nome = sc.nextLine();
-        if (isInvalidName(nome)) {
-            System.out.println("Nome inválido. Apenas letras e espaços são permitidos.");
-            return;
-        }
-
-        // Solicita o nome do animal de estimação
-        System.out.print("Digite o nome do seu pet: ");
-        String nomeAnimal = sc.nextLine();
-        if (isInvalidName(nomeAnimal)) {
-            System.out.println("Nome do pet inválido. Apenas letras e espaços são permitidos.");
-            return;
-        }
-
-        // Solicita o tipo de animal
-        System.out.print("Seu pet é um: ");
-        String tipoAnimal = sc.nextLine();
-        if (isInvalidName(tipoAnimal)) {
-            System.out.println("Tipo de animal inválido. Apenas letras e espaços são permitidos.");
-            return;
-        }
-
-        // Cria um novo objeto ClienteData e o adiciona à lista de clientes
-        ClienteData clienteData = new ClienteData(nome, nomeAnimal, tipoAnimal);
-        clientes.add(clienteData);
+        ClienteData cliente = new ClienteData(nome, nomeAnimal, tipoAnimal);
+        clientes.add(cliente);
         System.out.println("Cliente cadastrado com sucesso!");
+
+        List<Agendamento.Servicos> servicos = new ArrayList<>();
+        int opcao;
+        do {
+            System.out.print("Deseja agendar um serviço? (1-Banho, 2-Tosa, 3-Veterinario, 4-Vacinacao, 0-Não): ");
+            opcao = scanner.nextInt();
+            if (opcao > 0 && opcao <= 4) {
+                Agendamento.Servicos servico = Agendamento.Servicos.values()[opcao - 1];
+                if (!cliente.getServicos().contains(servico)) {
+                    servicos.add(servico);
+                } else {
+                    System.out.println("O serviço " + servico + " já está agendado. Escolha outro serviço.");
+                }
+            } else if (opcao != 0) {
+                System.out.println("Opção inválida. Por favor, tente novamente.");
+            }
+        } while (opcao != 0);
+
+        if (!servicos.isEmpty()) {
+            cliente.adicionarServicos(servicos);
+            System.out.println("Serviços agendados com sucesso!");
+        }
     }
 
-    /**
-     * Verifica se o nome fornecido é inválido.
-     *
-     * @param value O nome a ser validado.
-     * @return true se o nome for inválido; caso contrário, false.
-     */
-    private boolean isInvalidName(String value) {
-        return value == null || !value.matches("[A-Za-z ]+") || value.trim().isEmpty();
-    }
-
-    /**
-     * Método para listar todos os clientes cadastrados.
-     * Se não houver clientes, uma mensagem é exibida.
-     */
     public void listarClientes() {
         if (clientes.isEmpty()) {
             System.out.println("Nenhum cliente cadastrado.");
-            return;
-        }
-        // Exibe os detalhes de cada cliente
-        for (ClienteData c : clientes) {
-            System.out.println(c);
+        } else {
+            for (ClienteData cliente : clientes) {
+                System.out.println(cliente);
+            }
         }
     }
 }

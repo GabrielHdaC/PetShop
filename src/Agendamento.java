@@ -1,98 +1,57 @@
-/**
- * A classe Agendamento representa um agendamento de serviço para um cliente.
- * Esta classe contém informações sobre o serviço a ser prestado, o status do agendamento
- * e os dados do cliente.
- */
-public class Agendamento {
-    private String servico;                // O serviço a ser agendado
-    private StatusAgendamento status;      // O status do agendamento (agendado, concluído, cancelado)
-    private Cliente cliente;                // O cliente associado ao agendamento
+import java.util.List;
 
-    /**
-     * Construtor da classe Agendamento.
-     *
-     * @param servico  O serviço a ser agendado.
-     * @param status   O status inicial do agendamento.
-     * @param cliente  O cliente associado ao agendamento.
-     */
-    public Agendamento(String servico, StatusAgendamento status, Cliente cliente) {
+public class Agendamento {
+    private final Servicos servico;       // Serviço a ser realizado
+    private StatusAgendamento status;     // Status do agendamento (imutável após criação)
+    private final ClienteData cliente;    // Cliente associado ao agendamento
+
+    public Agendamento(Servicos servico, ClienteData cliente) {
+        if (cliente == null) {
+            throw new IllegalArgumentException("Cliente não pode ser nulo.");
+        }
         this.servico = servico;
-        this.status = status;  // Usa o tipo seguro de enum
+        this.status = StatusAgendamento.AGENDADO;
         this.cliente = cliente;
+        this.cliente.adicionarServicos(List.of(servico)); // Marca o cliente como agendado
     }
 
-    // Métodos getters e setters
-
-    /**
-     * Retorna o serviço associado ao agendamento.
-     *
-     * @return O serviço a ser prestado.
-     */
-    public String getServico() {
+    public Servicos getServico() {
         return servico;
     }
 
-    /**
-     * Define o serviço associado ao agendamento.
-     *
-     * @param servico O novo serviço a ser prestado.
-     */
-    public void setServico(String servico) {
-        this.servico = servico;
-    }
-
-    /**
-     * Retorna o status do agendamento.
-     *
-     * @return O status atual do agendamento.
-     */
     public StatusAgendamento getStatus() {
         return status;
     }
 
-    /**
-     * Define o status do agendamento.
-     *
-     * @param status O novo status a ser definido para o agendamento.
-     */
-    public void setStatus(StatusAgendamento status) {
-        this.status = status;  // Usa o tipo seguro de enum
-    }
-
-    /**
-     * Retorna o cliente associado ao agendamento.
-     *
-     * @return O cliente relacionado ao agendamento.
-     */
-    public Cliente getCliente() {
+    public ClienteData getCliente() {
         return cliente;
     }
 
-    /**
-     * Define o cliente associado ao agendamento.
-     *
-     * @param cliente O novo cliente a ser associado ao agendamento.
-     */
-    public void setCliente(Cliente cliente) {
-        this.cliente = cliente;
+    public void concluirAgendamento() {
+        this.status = StatusAgendamento.CONCLUIDO;
+        this.cliente.removerServico(servico); // Marca o cliente como não agendado se não houver mais serviços
     }
 
-    /**
-     * Retorna uma representação em String do objeto Agendamento.
-     *
-     * @return Uma string formatada com os detalhes do agendamento.
-     */
+    public void cancelarAgendamento() {
+        this.status = StatusAgendamento.CANCELADO;
+        this.cliente.removerServico(servico); // Marca o cliente como não agendado se não houver mais serviços
+    }
+
     @Override
     public String toString() {
         return "Agendamento: [Serviço: " + servico + ", Status: " + status + ", Cliente: " + cliente.getNome() + "]";
     }
 
-    /**
-     * Enum que representa os diferentes status de um agendamento.
-     */
     public enum StatusAgendamento {
-        AGENDADO,    // O agendamento foi criado
-        CONCLUIDO,   // O agendamento foi concluído
-        CANCELADO    // O agendamento foi cancelado
+        AGENDADO,
+        CONCLUIDO,
+        CANCELADO
+    }
+
+    public enum Servicos {
+        BANHO,
+        TOSA,
+        VETERINARIO,  // Expansão para outros serviços
+        VACINACAO
     }
 }
